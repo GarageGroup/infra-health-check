@@ -10,23 +10,23 @@ partial class HealthCheckHandler
 {
     public async ValueTask<Result<HealthCheckOut, Failure<HandlerFailureCode>>> HandleAsync(Unit input, CancellationToken cancellationToken)
     {
-        if (helthCheckApis.Length is 0)
+        if (healthCheckApis.Length is 0)
         {
             return EmptyHealthCheckOutput;
         }
 
         var failures = new ConcurrentBag<(int Index, Failure<Unit> Failure)>();
-        await Parallel.ForEachAsync(Enumerable.Range(0, helthCheckApis.Length), InnerHandleAsync).ConfigureAwait(false);
+        await Parallel.ForEachAsync(Enumerable.Range(0, healthCheckApis.Length), InnerHandleAsync).ConfigureAwait(false);
 
         if (failures.IsEmpty)
         {
             return new HealthCheckOut(
                 status: StatusHealthy,
-                services: helthCheckApis.ToDictionary(GetServiceName, GetStatusHealthy));
+                services: healthCheckApis.ToDictionary(GetServiceName, GetStatusHealthy));
         }
 
         var failure = failures.OrderBy(GetIndex).First();
-        var serviceName = helthCheckApis[failure.Index].ServiceName;
+        var serviceName = healthCheckApis[failure.Index].ServiceName;
 
         return Failure.Create(
             failureCode: HandlerFailureCode.Transient,
@@ -37,7 +37,7 @@ partial class HealthCheckHandler
         {
             try
             {
-                var result = await helthCheckApis[index].PingAsync(default, cancellationToken).ConfigureAwait(false);
+                var result = await healthCheckApis[index].PingAsync(default, cancellationToken).ConfigureAwait(false);
                 if (result.IsFailure)
                 {
                     failures.Add((index, result.FailureOrThrow()));
@@ -53,11 +53,11 @@ partial class HealthCheckHandler
             =>
             item.Index;
 
-        static string GetServiceName(IServiceHelthCheckApi api)
+        static string GetServiceName(IServiceHealthCheckApi api)
             =>
             api.ServiceName;
 
-        static string GetStatusHealthy(IServiceHelthCheckApi _)
+        static string GetStatusHealthy(IServiceHealthCheckApi _)
             =>
             StatusHealthy;
     }

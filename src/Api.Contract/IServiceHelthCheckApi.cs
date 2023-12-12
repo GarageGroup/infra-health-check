@@ -1,6 +1,6 @@
 ﻿namespace GarageGroup.Infra;
 
-public interface IServiceHelthCheckApi : IPingSupplier
+public interface IServiceHealthCheckApi : IPingSupplier
 {
     string ServiceName { get; }
 }

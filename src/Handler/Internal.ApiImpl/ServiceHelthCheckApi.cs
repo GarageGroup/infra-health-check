@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace GarageGroup.Infra;
 
-internal sealed class ServiceHelthCheckApi : IServiceHelthCheckApi
+internal sealed class ServiceHealthCheckApi : IServiceHealthCheckApi
 {
     private readonly IPingSupplier pingSupplier;
 
-    internal ServiceHelthCheckApi(string serviceName, IPingSupplier pingSupplier)
+    internal ServiceHealthCheckApi(string serviceName, IPingSupplier pingSupplier)
     {
         ServiceName = serviceName.OrEmpty();
         this.pingSupplier = pingSupplier;

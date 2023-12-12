@@ -17,9 +17,9 @@ internal sealed partial class HealthCheckHandler : IHealthCheckHandler
         EmptyHealthCheckOutput = new(StatusHealthy, default);
     }
 
-    private readonly IServiceHelthCheckApi[] helthCheckApis;
+    private readonly IServiceHealthCheckApi[] healthCheckApis;
 
-    internal HealthCheckHandler([AllowNull] IServiceHelthCheckApi[] helthCheckApis)
+    internal HealthCheckHandler([AllowNull] IServiceHealthCheckApi[] healthCheckApis)
         =>
-        this.helthCheckApis = helthCheckApis ?? Array.Empty<IServiceHelthCheckApi>();
+        this.healthCheckApis = healthCheckApis ?? Array.Empty<IServiceHealthCheckApi>();
 }

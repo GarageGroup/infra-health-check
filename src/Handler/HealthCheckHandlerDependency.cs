@@ -5,23 +5,23 @@ namespace GarageGroup.Infra;
 
 public static class HealthCheckHandlerDependency
 {
-    public static Dependency<IHealthCheckHandler> UseHealthCheckHandler(this Dependency<IServiceHelthCheckApi[]> dependency)
+    public static Dependency<IHealthCheckHandler> UseHealthCheckHandler(this Dependency<IServiceHealthCheckApi[]> dependency)
     {
         ArgumentNullException.ThrowIfNull(dependency);
         return dependency.Map<IHealthCheckHandler>(CreateHandler);
 
-        static HealthCheckHandler CreateHandler(IServiceHelthCheckApi[] healthCheckApis)
+        static HealthCheckHandler CreateHandler(IServiceHealthCheckApi[] healthCheckApis)
             =>
             new(healthCheckApis);
     }
 
-    public static Dependency<IServiceHelthCheckApi> UseServiceHelthCheckApi<TApi>(this Dependency<TApi> dependency, string serviceName)
+    public static Dependency<IServiceHealthCheckApi> UseServiceHealthCheckApi<TApi>(this Dependency<TApi> dependency, string serviceName)
         where TApi : IPingSupplier
     {
         ArgumentNullException.ThrowIfNull(dependency);
-        return dependency.Map<IServiceHelthCheckApi>(CreateApi);
+        return dependency.Map<IServiceHealthCheckApi>(CreateApi);
 
-        ServiceHelthCheckApi CreateApi(TApi api)
+        ServiceHealthCheckApi CreateApi(TApi api)
         {
             ArgumentNullException.ThrowIfNull(api);
             return new(serviceName, api);
