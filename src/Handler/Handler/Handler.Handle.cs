@@ -18,7 +18,7 @@ partial class HealthCheckHandler
         var failures = new ConcurrentBag<(int Index, Failure<Unit> Failure)>();
         await Parallel.ForEachAsync(Enumerable.Range(0, helthCheckApis.Length), InnerHandleAsync).ConfigureAwait(false);
 
-        if (failures.Count is 0)
+        if (failures.IsEmpty)
         {
             return new HealthCheckOut(
                 status: StatusHealthy,
