@@ -1,1 +1,1 @@
-# infra-health-ckeck
+# infra-health-check
