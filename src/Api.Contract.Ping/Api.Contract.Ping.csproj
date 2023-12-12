@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>GarageGroup.Infra</RootNamespace>
+    <AssemblyName>GarageGroup.Infra.HealthCheck.Api.Contract.Ping</AssemblyName>
+    <Version>0.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PrimeFuncPack.Core.Failure" Version="2.2.0" />
+    <PackageReference Include="PrimeFuncPack.Core.Result" Version="2.0.2" />
+  </ItemGroup>
+
+</Project>
