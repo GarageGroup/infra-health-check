@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,30 +9,51 @@ namespace GarageGroup.Infra;
 
 partial class HealthCheckHandler
 {
-    public async ValueTask<Result<HealthCheckOut, Failure<HandlerFailureCode>>> HandleAsync(Unit input, CancellationToken cancellationToken)
+    public async ValueTask<Result<string, Failure<HandlerFailureCode>>> HandleAsync(Unit input, CancellationToken cancellationToken)
     {
         if (healthCheckApis.Length is 0)
         {
-            return EmptyHealthCheckOutput;
+            return EmptyOutputLazy.Value;
         }
 
-        var failures = new ConcurrentBag<(int Index, Failure<Unit> Failure)>();
+        var failures = new ConcurrentDictionary<int, Failure<Unit>>();
         await Parallel.ForEachAsync(Enumerable.Range(0, healthCheckApis.Length), InnerHandleAsync).ConfigureAwait(false);
 
-        if (failures.IsEmpty)
+        var services = new Dictionary<string, string>(healthCheckApis.Length);
+        var sourceExceptions = new List<Exception>(failures.Count);
+
+        var isHealthy = true;
+
+        for (var i = 0; i < healthCheckApis.Length; i++)
         {
-            return new HealthCheckOut(
-                status: StatusHealthy,
-                services: healthCheckApis.ToDictionary(GetServiceName, GetStatusHealthy));
+            var serviceName = healthCheckApis[i].ServiceName;
+
+            if (failures.TryGetValue(i, out var failure) is false)
+            {
+                services[serviceName] = StatusHealthy;
+                continue;
+            }
+
+            isHealthy = false;
+            services[serviceName] = string.IsNullOrWhiteSpace(failure.FailureMessage) ? StatusUnhealthy : failure.FailureMessage;
+
+            if (failure.SourceException is not null)
+            {
+                sourceExceptions.Add(failure.SourceException);
+            }
         }
 
-        var failure = failures.OrderBy(GetIndex).First();
-        var serviceName = healthCheckApis[failure.Index].ServiceName;
+        if (isHealthy)
+        {
+            return Serialize(
+                yaml: new(StatusHealthy, services));
+        }
 
         return Failure.Create(
             failureCode: HandlerFailureCode.Transient,
-            failureMessage: $"\"{serviceName}\": \"{failure.Failure.FailureMessage}\"",
-            sourceException: failure.Failure.SourceException);
+            failureMessage: Serialize(
+                yaml: new(StatusUnhealthy, services)),
+            sourceException: AggregateException(sourceExceptions));
 
         async ValueTask InnerHandleAsync(int index, CancellationToken cancellationToken)
         {
@@ -40,25 +62,28 @@ partial class HealthCheckHandler
                 var result = await healthCheckApis[index].PingAsync(default, cancellationToken).ConfigureAwait(false);
                 if (result.IsFailure)
                 {
-                    failures.Add((index, result.FailureOrThrow()));
+                    _ = failures.TryAdd(index, result.FailureOrThrow());
                 }
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                failures.Add((index, ex.ToFailure("An unexpected exception occured")));
+                _ = failures.TryAdd(index, ex.ToFailure($"An unexpected exception occured: '{ex.Message}'"));
             }
         }
+    }
 
-        static int GetIndex((int Index, Failure<Unit>) item)
-            =>
-            item.Index;
+    private static Exception? AggregateException(IReadOnlyList<Exception> exceptions)
+    {
+        if (exceptions.Count is 0)
+        {
+            return null;
+        }
 
-        static string GetServiceName(IServiceHealthCheckApi api)
-            =>
-            api.ServiceName;
+        if (exceptions.Count is 1)
+        {
+            return exceptions[0];
+        }
 
-        static string GetStatusHealthy(IServiceHealthCheckApi _)
-            =>
-            StatusHealthy;
+        return new AggregateException(exceptions);
     }
 }
