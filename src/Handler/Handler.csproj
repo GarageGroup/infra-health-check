@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
+    <langVersion>latest</langVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RootNamespace>GarageGroup.Infra</RootNamespace>
     <AssemblyName>GarageGroup.Infra.HealthCheck.Handler</AssemblyName>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,6 +17,7 @@
     <PackageReference Include="GarageGroup.Infra.HealthCheck.Api.Contract" Version="0.0.1" />
     <PackageReference Include="PrimeFuncPack.Dependency.Core" Version="2.1.0" />
     <PackageReference Include="PrimeFuncPack.Primitives.Strings" Version="2.0.3" />
+    <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
 </Project>

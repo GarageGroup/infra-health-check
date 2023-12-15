@@ -4,9 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GarageGroup.Infra;
 
-public sealed record class HealthCheckOut
+internal sealed record class HealthCheckYamlOut
 {
-    public HealthCheckOut([AllowNull] string status, [AllowNull] IReadOnlyDictionary<string, string> services)
+    public HealthCheckYamlOut(string status, [AllowNull] IReadOnlyDictionary<string, string> services)
     {
         Status = status.OrEmpty();
         Services = services?.Count is not > 0 ? null : services;
