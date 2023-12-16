@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -11,32 +11,25 @@ internal sealed partial class HealthCheckHandler : IHealthCheckHandler
 
     private const string StatusUnhealthy = "Unhealthy";
 
-    public static readonly HealthCheckHandler Empty;
-
-    private static readonly Lazy<string> EmptyOutputLazy;
-
     private static readonly ISerializer YamlSerializer;
 
     static HealthCheckHandler()
-    {
-        Empty = new(default);
-
-        YamlSerializer = new SerializerBuilder().WithNamingConvention(PascalCaseNamingConvention.Instance).Build();
-        EmptyOutputLazy = new(BuildEmptyOutput);
-    }
+        =>
+         YamlSerializer = new SerializerBuilder().WithNamingConvention(PascalCaseNamingConvention.Instance).Build();
 
     private readonly IServiceHealthCheckApi[] healthCheckApis;
 
-    internal HealthCheckHandler([AllowNull] IServiceHealthCheckApi[] healthCheckApis)
-        =>
+    private readonly HealthCheckOption option;
+
+    internal HealthCheckHandler([AllowNull] IServiceHealthCheckApi[] healthCheckApis, HealthCheckOption option)
+    {
         this.healthCheckApis = healthCheckApis ?? [];
+        this.option = option;
+    }
 
-    private static string BuildEmptyOutput()
-        =>
-        Serialize(
-            yaml: new(StatusHealthy, default));
-
-    private static string Serialize(HealthCheckYamlOut yaml)
-        =>
-        YamlSerializer.Serialize(yaml);
+    private string BuildYaml(string status, [AllowNull] IReadOnlyDictionary<string, string>? services = default)
+    {
+        var yaml = new HealthCheckYamlOut(option.Info, status, services);
+        return YamlSerializer.Serialize(yaml);
+    }
 }
