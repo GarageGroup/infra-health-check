@@ -13,7 +13,7 @@ partial class HealthCheckHandler
     {
         if (healthCheckApis.Length is 0)
         {
-            return EmptyOutputLazy.Value;
+            return BuildYaml(StatusHealthy);
         }
 
         var failures = new ConcurrentDictionary<int, Failure<Unit>>();
@@ -45,14 +45,12 @@ partial class HealthCheckHandler
 
         if (isHealthy)
         {
-            return Serialize(
-                yaml: new(StatusHealthy, services));
+            return BuildYaml(StatusHealthy, services);
         }
 
         return Failure.Create(
             failureCode: HandlerFailureCode.Transient,
-            failureMessage: Serialize(
-                yaml: new(StatusUnhealthy, services)),
+            failureMessage: BuildYaml(StatusUnhealthy, services),
             sourceException: AggregateException(sourceExceptions));
 
         async ValueTask InnerHandleAsync(int index, CancellationToken cancellationToken)
