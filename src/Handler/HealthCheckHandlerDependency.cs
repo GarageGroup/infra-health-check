@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
 using PrimeFuncPack;
+
+[assembly: InternalsVisibleTo("GarageGroup.Infra.HealthCheck.Handler.Test")]
 
 namespace GarageGroup.Infra;
 

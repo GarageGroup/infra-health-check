@@ -14,7 +14,7 @@ internal sealed class ServiceHealthCheckApi : IServiceHealthCheckApi
         this.pingSupplier = pingSupplier;
     }
 
-    public string ServiceName { get; private init; }
+    public string ServiceName { get; }
 
     public ValueTask<Result<Unit, Failure<Unit>>> PingAsync(Unit input, CancellationToken cancellationToken)
         =>

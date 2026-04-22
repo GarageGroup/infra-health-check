@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/.github/workflows/">
+    <File Path="../.github/workflows/dotnet.yml" />
+  </Folder>
+  <Project Path="Api.Contract.Ping/Api.Contract.Ping.csproj" />
+  <Project Path="Api.Contract/Api.Contract.csproj" />
+  <Project Path="Handler/Handler.csproj" />
+  <Project Path="Handler.Test/Handler.Test.csproj" />
+</Solution>
