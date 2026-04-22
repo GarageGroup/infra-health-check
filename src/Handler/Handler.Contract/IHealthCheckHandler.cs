@@ -2,6 +2,4 @@
 
 namespace GarageGroup.Infra;
 
-public interface IHealthCheckHandler : IHandler<Unit, string>
-{
-}
+public interface IHealthCheckHandler : IHandler<Unit, string>;

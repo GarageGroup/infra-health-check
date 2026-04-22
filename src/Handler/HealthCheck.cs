@@ -7,7 +7,7 @@ public static class HealthCheck
 {
     public static Dependency<IServiceHealthCheckApi[]> UseEmpty()
         =>
-        Dependency.Of(Array.Empty<IServiceHealthCheckApi>());
+        Dependency.Of<IServiceHealthCheckApi[]>([]);
 
     public static Dependency<IServiceHealthCheckApi[]> UseServices(params Dependency<IServiceHealthCheckApi>[] dependencies)
     {
